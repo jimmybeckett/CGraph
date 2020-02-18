@@ -4,13 +4,16 @@
 #include <stdio.h>
 
 LinkedList *ll;
+LLIterator *ll_iter;
 
 void setup(void) {
   ll = LinkedList_Allocate();
+  ll_iter = NULL;  // iterator can only be allocated after list is fully initialized
 }
 
 void teardown(void) {
   LinkedList_Free(ll);
+  LLIterator_Free(ll_iter);
 }
 
 int *alloc_int(int val) {
@@ -22,19 +25,19 @@ int *alloc_int(int val) {
 START_TEST(size) {
   ck_assert_int_eq(LinkedList_Size(ll), 0);
 
-  LinkedList_Push(ll, malloc(sizeof(int)));
+  LinkedList_Add(ll, malloc(sizeof(int)));
   ck_assert_int_eq(LinkedList_Size(ll), 1);
 
-  LinkedList_Push(ll, malloc(sizeof(int)));
+  LinkedList_Add(ll, malloc(sizeof(int)));
   ck_assert_int_eq(LinkedList_Size(ll), 2);
 
-  LinkedList_Pop(ll);
+  LinkedList_Remove(ll);
   ck_assert_int_eq(LinkedList_Size(ll), 1);
 
-  LinkedList_Pop(ll);
+  LinkedList_Remove(ll);
   ck_assert_int_eq(LinkedList_Size(ll), 0);
 
-  LinkedList_Pop(ll);  // pop from empty list
+  LinkedList_Remove(ll);  // remove from empty list
   ck_assert_int_eq(LinkedList_Size(ll), 0);
 }
 END_TEST
@@ -42,48 +45,49 @@ END_TEST
 START_TEST(is_empty) {
   ck_assert(LinkedList_IsEmpty(ll));
 
-  LinkedList_Push(ll, malloc(sizeof(int)));
+  LinkedList_Add(ll, malloc(sizeof(int)));
 
   ck_assert(!LinkedList_IsEmpty(ll));
 
-  LinkedList_Pop(ll);
+  LinkedList_Remove(ll);
 
   ck_assert(LinkedList_IsEmpty(ll));
 } 
 END_TEST
 
-START_TEST(pop) {
-  void *ptr = LinkedList_Pop(ll);
+START_TEST(remove_empty) {
+  void *ptr = LinkedList_Remove(ll);
   ck_assert(ptr == NULL);
+  ck_assert_int_eq(LinkedList_Size(ll), 0);
 }
 END_TEST
 
-START_TEST(push_pop) {
+START_TEST(add_remove) {
   int n = 10;
   for (int i = 1; i <= n; i++) {
-    LinkedList_Push(ll, alloc_int(i));
+    LinkedList_Add(ll, alloc_int(i));
   }
 
   for (int i = n; i > 0; i--) {
-    int *j = LinkedList_Pop(ll);
+    int *j = LinkedList_Remove(ll);
     ck_assert_int_eq(*j, i);
     free(j);
   }
 }
 END_TEST
 
-START_TEST(peek) {
-  ck_assert(LinkedList_Peek(ll) == NULL);
+START_TEST(head) {
+  ck_assert(LinkedList_Head(ll) == NULL);
 
-  LinkedList_Push(ll, alloc_int(1));
-  LinkedList_Push(ll, alloc_int(2));
+  LinkedList_Add(ll, alloc_int(1));
+  LinkedList_Add(ll, alloc_int(2));
 
-  int *n = LinkedList_Peek(ll);
+  int *n = LinkedList_Head(ll);
   ck_assert_int_eq(*n, 2);
 
-  LinkedList_Pop(ll);
+  LinkedList_Remove(ll);
 
-  n = LinkedList_Peek(ll);
+  n = LinkedList_Head(ll);
   ck_assert_int_eq(*n, 1);
 }
 END_TEST
@@ -91,10 +95,10 @@ END_TEST
 START_TEST(iterator_get) {
   int m = 2, n = 10;
   for (int i = m; i < m + n; i++) {
-    LinkedList_Push(ll, alloc_int(i));
+    LinkedList_Add(ll, alloc_int(i));
   }
 
-  LLIterator *ll_iter = LLIterator_Allocate(ll);
+  ll_iter = LLIterator_Allocate(ll);
 
   int i = m + n - 1;
   while (LLIterator_IsValid(ll_iter)) {
@@ -106,20 +110,17 @@ START_TEST(iterator_get) {
 
   ck_assert_int_eq(i, m - 1);
   ck_assert(!LLIterator_IsValid(ll_iter));
-
-  LLIterator_Free(ll_iter);
 }
 END_TEST
 
 START_TEST(iterator_remove) {
-  LinkedList_Push(ll, alloc_int(4));
-  LinkedList_Push(ll, alloc_int(3));
-  LinkedList_Push(ll, alloc_int(2));
-  LinkedList_Push(ll, alloc_int(1));
+  for (int i = 4; i > 0; i--) {
+    LinkedList_Add(ll, alloc_int(i));
+  }
   // 1 -> 2 -> 3 -> 4 ->
   // |
 
-  LLIterator *ll_iter = LLIterator_Allocate(ll);
+  ll_iter = LLIterator_Allocate(ll);
 
   int *n = LLIterator_Remove(ll_iter);
   ck_assert_int_eq(*n, 1);
@@ -129,7 +130,7 @@ START_TEST(iterator_remove) {
 
   n = LLIterator_Get(ll_iter);
   ck_assert_int_eq(*n, 2);
-  n = LinkedList_Peek(ll);
+  n = LinkedList_Head(ll);
   ck_assert_int_eq(*n, 2);
 
   LLIterator_Next(ll_iter);
@@ -154,14 +155,11 @@ START_TEST(iterator_remove) {
 
   ck_assert(!LLIterator_IsValid(ll_iter));
 
-  LLIterator_Free(ll_iter);
-
   // check to make sure the list ended in the correct state
-  n = LinkedList_Peek(ll);
+  n = LinkedList_Head(ll);
   ck_assert_int_eq(*n, 2);
 
-  LinkedList_Pop(ll);
-  ck_assert(LinkedList_IsEmpty(ll));
+  ck_assert_int_eq(LinkedList_Size(ll), 1);
 }
 END_TEST
 
@@ -173,9 +171,9 @@ Suite *basic_suite(void) {
 
   tcase_add_test(tc_basic, size);
   tcase_add_test(tc_basic, is_empty);
-  tcase_add_test(tc_basic, pop);
-  tcase_add_test(tc_basic, push_pop);
-  tcase_add_test(tc_basic, peek);
+  tcase_add_test(tc_basic, remove_empty);
+  tcase_add_test(tc_basic, add_remove);
+  tcase_add_test(tc_basic, head);
 
   TCase *tc_iterator = tcase_create("Iterator");
   tcase_add_checked_fixture(tc_iterator, setup, teardown);

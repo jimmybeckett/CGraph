@@ -20,11 +20,11 @@ size_t LinkedList_Size(LinkedList *linked_list);
 
 int32_t LinkedList_IsEmpty(LinkedList *linked_list);
 
-int32_t LinkedList_Push(LinkedList *linked_list, Payload_t payload);
+int32_t LinkedList_Add(LinkedList *linked_list, Payload_t payload);
 
-Payload_t LinkedList_Pop(LinkedList *linked_list);
+Payload_t LinkedList_Remove(LinkedList *linked_list);
 
-Payload_t LinkedList_Peek(LinkedList *linked_list);
+Payload_t LinkedList_Head(LinkedList *linked_list);
 
 /**************************************
  * Linked List Iterator

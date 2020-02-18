@@ -25,7 +25,7 @@ LinkedList *LinkedList_Allocate() {
 
 void LinkedList_Free(LinkedList *linked_list) {
   while (!LinkedList_IsEmpty(linked_list)) {
-    free(LinkedList_Pop(linked_list));
+    free(LinkedList_Remove(linked_list));
   }
 
   free(linked_list);
@@ -39,7 +39,7 @@ int32_t LinkedList_IsEmpty(LinkedList *linked_list) {
   return linked_list->size == 0;
 }
 
-int32_t LinkedList_Push(LinkedList *linked_list, Payload_t payload) {
+int32_t LinkedList_Add(LinkedList *linked_list, Payload_t payload) {
   Node *node = (Node*) malloc(sizeof(Node));
   if (node == NULL)  // check for malloc failure
     return 0;
@@ -56,7 +56,7 @@ int32_t LinkedList_Push(LinkedList *linked_list, Payload_t payload) {
   return 1;
 }
 
-Payload_t LinkedList_Pop(LinkedList *linked_list) {
+Payload_t LinkedList_Remove(LinkedList *linked_list) {
   if (LinkedList_IsEmpty(linked_list))
     return NULL;
 
@@ -76,7 +76,7 @@ Payload_t LinkedList_Pop(LinkedList *linked_list) {
   return payload;
 }
 
-Payload_t LinkedList_Peek(LinkedList *linked_list) {
+Payload_t LinkedList_Head(LinkedList *linked_list) {
   if (LinkedList_IsEmpty(linked_list))
     return NULL;
   return linked_list->head->payload;
