@@ -74,3 +74,9 @@ Payload_t LinkedList_Pop(LinkedList *linked_list) {
   return payload;
 }
 
+
+Payload_t LinkedList_Peek(LinkedList *linked_list) {
+  if (LinkedList_IsEmpty(linked_list))
+    return NULL;
+  return linked_list->head->payload;
+}

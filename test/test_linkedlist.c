@@ -64,6 +64,22 @@ START_TEST(push_pop) {
 }
 END_TEST
 
+START_TEST(peek) {
+  ck_assert(LinkedList_Peek(ll) == NULL);
+
+  LinkedList_Push(ll, alloc_int(1));
+  LinkedList_Push(ll, alloc_int(2));
+
+  int *n = LinkedList_Peek(ll);
+  ck_assert_int_eq(*n, 2);
+
+  LinkedList_Pop(ll);
+
+  n = LinkedList_Peek(ll);
+  ck_assert_int_eq(*n, 1);
+}
+END_TEST
+
 Suite *basic_suite(void) {
   Suite *suite = suite_create("LinkedList Basic Suite");
   TCase *tc_core = tcase_create("Core");
@@ -73,6 +89,7 @@ Suite *basic_suite(void) {
   tcase_add_test(tc_core, size);
   tcase_add_test(tc_core, is_empty);
   tcase_add_test(tc_core, push_pop);
+  tcase_add_test(tc_core, peek);
 
   suite_add_tcase(suite, tc_core);
   return suite;

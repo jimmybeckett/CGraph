@@ -20,4 +20,6 @@ int32_t LinkedList_Push(LinkedList *linked_list, Payload_t payload);
 
 Payload_t LinkedList_Pop(LinkedList *linked_list);
 
+Payload_t LinkedList_Peek(LinkedList *linked_list);
+
 #endif  // LINKED_LIST_H_
