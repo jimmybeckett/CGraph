@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/**************************************
+ * Linked List
+**************************************/
+
 typedef struct linked_list_t LinkedList;
 
 typedef void* Payload_t;
@@ -21,5 +25,23 @@ int32_t LinkedList_Push(LinkedList *linked_list, Payload_t payload);
 Payload_t LinkedList_Pop(LinkedList *linked_list);
 
 Payload_t LinkedList_Peek(LinkedList *linked_list);
+
+/**************************************
+ * Linked List Iterator
+**************************************/
+
+typedef struct lliterator_t LLIterator;
+
+LLIterator *LLIterator_Allocate(LinkedList *linked_list);
+
+void LLIterator_Free(LLIterator *lliterator);
+
+int32_t LLIterator_IsValid(LLIterator *lliterator);
+
+int32_t LLIterator_Next(LLIterator *lliterator);
+
+Payload_t LLIterator_Get(LLIterator *lliterator);
+
+Payload_t LLIterator_Remove(LLIterator *lliterator);
 
 #endif  // LINKED_LIST_H_
