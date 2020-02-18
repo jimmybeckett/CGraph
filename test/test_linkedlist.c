@@ -21,16 +21,19 @@ int *alloc_int(int val) {
 START_TEST(size) {
   ck_assert_int_eq(LinkedList_Size(ll), 0);
 
-  LinkedList_PushHead(ll, malloc(sizeof(int)));
+  LinkedList_Push(ll, malloc(sizeof(int)));
   ck_assert_int_eq(LinkedList_Size(ll), 1);
 
-  LinkedList_PushTail(ll, malloc(sizeof(int)));
+  LinkedList_Push(ll, malloc(sizeof(int)));
   ck_assert_int_eq(LinkedList_Size(ll), 2);
 
-  LinkedList_PopHead(ll);
+  LinkedList_Pop(ll);
   ck_assert_int_eq(LinkedList_Size(ll), 1);
 
-  LinkedList_PopTail(ll);
+  LinkedList_Pop(ll);
+  ck_assert_int_eq(LinkedList_Size(ll), 0);
+
+  LinkedList_Pop(ll);  // pop from empty list
   ck_assert_int_eq(LinkedList_Size(ll), 0);
 }
 END_TEST
@@ -38,59 +41,26 @@ END_TEST
 START_TEST(is_empty) {
   ck_assert(LinkedList_IsEmpty(ll));
 
-  LinkedList_PushHead(ll, malloc(sizeof(int)));
+  LinkedList_Push(ll, malloc(sizeof(int)));
 
   ck_assert(!LinkedList_IsEmpty(ll));
 
-  LinkedList_PopTail(ll);
+  LinkedList_Pop(ll);
 
   ck_assert(LinkedList_IsEmpty(ll));
 } 
 END_TEST
 
-START_TEST(push_pop_head) {
+START_TEST(push_pop) {
   int n = 10;
   for (int i = 1; i <= n; i++) {
-    LinkedList_PushHead(ll, alloc_int(i));
+    LinkedList_Push(ll, alloc_int(i));
   }
   for (int i = n; i > 0; i--) {
-    int *j = LinkedList_PopHead(ll);
+    int *j = LinkedList_Pop(ll);
     ck_assert_int_eq(*j, i);
     free(j);
   }
-}
-END_TEST
-
-START_TEST(push_pop_tail) {
-  int n = 10;
-  for (int i = 1; i <= n; i++) {
-    LinkedList_PushTail(ll, alloc_int(i));
-  }
-  for (int i = n; i > 0; i--) {
-    int *j = LinkedList_PopTail(ll);
-    ck_assert_int_eq(*j, i);
-    free(j);
-  }
-}
-END_TEST
-
-START_TEST(push_pop_head_tail) {
-  LinkedList_PushHead(ll, alloc_int(2));
-  LinkedList_PushHead(ll, alloc_int(1));
-  LinkedList_PushTail(ll, alloc_int(3));
-  // ll: <-> 1 <-> 2 <-> 3 <->
- 
-  int *n = LinkedList_PopHead(ll);
-  ck_assert_int_eq(*n, 1);
-  free(n);
-
-  n = LinkedList_PopTail(ll);
-  ck_assert_int_eq(*n, 3);
-  free(n);
-
-  n = LinkedList_PopHead(ll);
-  ck_assert_int_eq(*n, 2);
-  free(n);
 }
 END_TEST
 
@@ -102,9 +72,7 @@ Suite *basic_suite(void) {
 
   tcase_add_test(tc_core, size);
   tcase_add_test(tc_core, is_empty);
-  tcase_add_test(tc_core, push_pop_head);
-  tcase_add_test(tc_core, push_pop_tail);
-  tcase_add_test(tc_core, push_pop_head_tail);
+  tcase_add_test(tc_core, push_pop);
 
   suite_add_tcase(suite, tc_core);
   return suite;
