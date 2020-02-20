@@ -10,7 +10,7 @@
 
 typedef struct linked_list_t LinkedList;
 
-typedef void* Payload_t;
+typedef void *Payload_t;
 
 LinkedList *LinkedList_Allocate();
 
@@ -20,28 +20,14 @@ size_t LinkedList_Size(LinkedList *linked_list);
 
 int32_t LinkedList_IsEmpty(LinkedList *linked_list);
 
-int32_t LinkedList_Add(LinkedList *linked_list, Payload_t payload);
+int32_t LinkedList_PushHead(LinkedList *linked_list, Payload_t payload);
 
-Payload_t LinkedList_Remove(LinkedList *linked_list);
+Payload_t LinkedList_PopHead(LinkedList *linked_list);
 
 Payload_t LinkedList_Head(LinkedList *linked_list);
 
-/**************************************
- * Linked List Iterator
-**************************************/
+int32_t LinkedList_PushTail(LinkedList *linked_list, Payload_t payload);
 
-typedef struct lliterator_t LLIterator;
-
-LLIterator *LLIterator_Allocate(LinkedList *linked_list);
-
-void LLIterator_Free(LLIterator *lliterator);
-
-int32_t LLIterator_IsValid(LLIterator *lliterator);
-
-int32_t LLIterator_Next(LLIterator *lliterator);
-
-Payload_t LLIterator_Get(LLIterator *lliterator);
-
-Payload_t LLIterator_Remove(LLIterator *lliterator);
+Payload_t LinkedList_Tail(LinkedList *linked_list);
 
 #endif  // LINKED_LIST_H_
