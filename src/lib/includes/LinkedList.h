@@ -46,4 +46,7 @@ bool LinkedList_PushTail(LinkedList *linked_list, Payload_t payload);
 // The payload remains the responsiblity of the linked list to deallocate.
 Payload_t LinkedList_PeekTail(LinkedList *linked_list);
 
+// Appends the contents from src onto the tail of destination, leaving src empty.
+void LinkedList_Append(LinkedList *dest, LinkedList *src);
+
 #endif  // LINKED_LIST_H_

@@ -108,3 +108,19 @@ Payload_t LinkedList_PeekTail(LinkedList *linked_list) {
     return NULL;
   return linked_list->tail->payload;
 }
+
+void LinkedList_Append(LinkedList *dest, LinkedList *src) {
+  if (src->size == 0)
+    return;
+
+  if (dest->size == 0) {
+    dest->head = src->head;
+  } else {
+    dest->tail->next = src->head;
+  }
+  dest->tail = src->tail;
+  dest->size += src->size;
+  
+  src->head = src->tail = NULL;
+  src->size = 0;
+}
