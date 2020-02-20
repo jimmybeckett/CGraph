@@ -1,7 +1,7 @@
-#include <stdint.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include "LinkedList.h"
+#include <LinkedList.h>
 
 typedef struct node_t {
   Payload_t payload;
@@ -35,14 +35,14 @@ size_t LinkedList_Size(LinkedList *linked_list) {
   return linked_list->size;
 }
 
-int32_t LinkedList_IsEmpty(LinkedList *linked_list) {
+bool LinkedList_IsEmpty(LinkedList *linked_list) {
   return linked_list->size == 0;
 }
 
-int32_t LinkedList_PushHead(LinkedList *linked_list, Payload_t payload) {
+bool LinkedList_PushHead(LinkedList *linked_list, Payload_t payload) {
   Node *node = (Node *) malloc(sizeof(Node));
   if (node == NULL)  // check for malloc failure
-    return 0;
+    return false;
 
   *node = (Node) {.payload = payload, .next = linked_list->head};
 
@@ -54,7 +54,7 @@ int32_t LinkedList_PushHead(LinkedList *linked_list, Payload_t payload) {
 
   linked_list->size++;
 
-  return 1;
+  return true;
 }
 
 Payload_t LinkedList_PopHead(LinkedList *linked_list) {
@@ -84,10 +84,10 @@ Payload_t LinkedList_Head(LinkedList *linked_list) {
   return linked_list->head->payload;
 }
 
-int32_t LinkedList_PushTail(LinkedList *linked_list, Payload_t payload) {
+bool LinkedList_PushTail(LinkedList *linked_list, Payload_t payload) {
   Node *node = (Node *) malloc(sizeof(Node));
   if (node == NULL)  // check for malloc failure
-    return 0;
+    return false;
 
   *node = (Node) {.payload = payload, .next = NULL};
 
@@ -100,7 +100,7 @@ int32_t LinkedList_PushTail(LinkedList *linked_list, Payload_t payload) {
 
   linked_list->size++;
 
-  return 1;
+  return true;
 }
 
 Payload_t LinkedList_Tail(LinkedList *linked_list) {
