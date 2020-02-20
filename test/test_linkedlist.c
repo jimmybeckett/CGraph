@@ -10,7 +10,7 @@ void setup(void) {
 }
 
 void teardown(void) {
-  LinkedList_Free(ll);
+  LinkedList_Free(ll, free);
 }
 
 int *alloc_int(int val) {
@@ -142,7 +142,22 @@ START_TEST(append) {
     ck_assert_int_eq(*n, i);
   }
 
-  LinkedList_Free(ll2);
+  LinkedList_Free(ll2, free);
+}
+END_TEST
+
+void incrementInt(void *n) {
+  *(int *)n = *(int *)n + 1;
+}
+
+START_TEST(test_free) {
+  LinkedList *linked_list = LinkedList_Allocate();
+  int *n = alloc_int(1);
+  LinkedList_PushHead(linked_list, n);
+
+  LinkedList_Free(linked_list, incrementInt);
+  ck_assert_int_eq(*n, 2);
+  free(n);
 }
 END_TEST
 
@@ -158,6 +173,7 @@ Suite *basic_suite(void) {
   tcase_add_test(tc_basic, add_remove);
   tcase_add_test(tc_basic, peek_head);
   tcase_add_test(tc_basic, peek_tail);
+  tcase_add_test(tc_basic, test_free);
 
   suite_add_tcase(suite, tc_basic);
   return suite;

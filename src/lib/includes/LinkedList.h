@@ -14,9 +14,9 @@ typedef void *Payload_t;
 // Returns NULL on failure.
 LinkedList *LinkedList_Allocate();
 
-// Frees the linked list and all elements it contains.
-// O(size)
-void LinkedList_Free(LinkedList *linked_list);
+// Calls free_function on every element in the list.
+// Runtime is O(size)
+void LinkedList_Free(LinkedList *linked_list, void (free_function(void *payload)));
 
 // Returns the number of elements in the linked list.
 size_t LinkedList_Size(LinkedList *linked_list);
