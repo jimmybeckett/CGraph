@@ -9,11 +9,16 @@ include(CheckLibraryExists)
 include(CheckSymbolExists)
 include(CheckTypeSize)
 
-# Since Check uses Threads to paralelize the tests, it's mandatory
-# add pthread as a dependency, alongside the Check libraries.
+# linked list test
 add_executable(test_linkedlist test_linkedlist.c)
 target_link_libraries(test_linkedlist linkedlist ${CHECK_LIBRARIES} pthread)
 
-# Create testing target and redirect its output to `Testing` folder
 add_test(NAME test_linkedlist COMMAND test_linkedlist WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Testing)
 set_tests_properties(test_linkedlist PROPERTIES TIMEOUT 30) 
+
+# hash table test
+add_executable(test_hashtable test_hashtable.c)
+target_link_libraries(test_hashtable hashtable ${CHECK_LIBRARIES} pthread)
+
+add_test(NAME test_hashtable COMMAND test_hashtable WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Testing)
+set_tests_properties(test_hashtable PROPERTIES TIMEOUT 30)
