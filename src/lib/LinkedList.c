@@ -78,7 +78,7 @@ Payload_t LinkedList_PopHead(LinkedList *linked_list) {
   return payload;
 }
 
-Payload_t LinkedList_Head(LinkedList *linked_list) {
+Payload_t LinkedList_PeekHead(LinkedList *linked_list) {
   if (LinkedList_IsEmpty(linked_list))
     return NULL;
   return linked_list->head->payload;
@@ -103,7 +103,7 @@ bool LinkedList_PushTail(LinkedList *linked_list, Payload_t payload) {
   return true;
 }
 
-Payload_t LinkedList_Tail(LinkedList *linked_list) {
+Payload_t LinkedList_PeekTail(LinkedList *linked_list) {
   if (LinkedList_IsEmpty(linked_list))
     return NULL;
   return linked_list->tail->payload;

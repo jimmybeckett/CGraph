@@ -35,7 +35,7 @@ Payload_t LinkedList_PopHead(LinkedList *linked_list);
 
 // Returns the payload stored in the head of the linked list.
 // The payload remains the responsibility of the linked list to deallocate.
-Payload_t LinkedList_Head(LinkedList *linked_list);
+Payload_t LinkedList_PeekHead(LinkedList *linked_list);
 
 // Pushes payload to the tail of the linked list.
 // Responsibility for deallocating payload is tranferred to the linked list.
@@ -44,6 +44,6 @@ bool LinkedList_PushTail(LinkedList *linked_list, Payload_t payload);
 
 // Returns the payload stored in the tail of the linked list.
 // The payload remains the responsiblity of the linked list to deallocate.
-Payload_t LinkedList_Tail(LinkedList *linked_list);
+Payload_t LinkedList_PeekTail(LinkedList *linked_list);
 
 #endif  // LINKED_LIST_H_

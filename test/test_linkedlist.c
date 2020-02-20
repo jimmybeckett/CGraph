@@ -79,34 +79,34 @@ START_TEST(add_remove) {
 }
 END_TEST
 
-START_TEST(head) {
-  ck_assert(LinkedList_Head(ll) == NULL);
+START_TEST(peek_head) {
+  ck_assert(LinkedList_PeekHead(ll) == NULL);
 
   LinkedList_PushHead(ll, alloc_int(1));
   LinkedList_PushHead(ll, alloc_int(2));
 
-  int *n = LinkedList_Head(ll);
+  int *n = LinkedList_PeekHead(ll);
   ck_assert_int_eq(*n, 2);
 
   LinkedList_PopHead(ll);
 
-  n = LinkedList_Head(ll);
+  n = LinkedList_PeekHead(ll);
   ck_assert_int_eq(*n, 1);
 }
 END_TEST
 
-START_TEST(tail) {
-  ck_assert(LinkedList_Tail(ll) == NULL);
+START_TEST(peek_tail) {
+  ck_assert(LinkedList_PeekTail(ll) == NULL);
 
   LinkedList_PushTail(ll, alloc_int(1));
   LinkedList_PushTail(ll, alloc_int(2));
 
-  int *n = LinkedList_Tail(ll);
+  int *n = LinkedList_PeekTail(ll);
   ck_assert_int_eq(*n, 2);
 
   LinkedList_PopHead(ll);
 
-  n = LinkedList_Head(ll);
+  n = LinkedList_PeekTail(ll);
   ck_assert_int_eq(*n, 2);
 }
 END_TEST
@@ -121,8 +121,8 @@ Suite *basic_suite(void) {
   tcase_add_test(tc_basic, is_empty);
   tcase_add_test(tc_basic, pop_empty);
   tcase_add_test(tc_basic, add_remove);
-  tcase_add_test(tc_basic, head);
-  tcase_add_test(tc_basic, tail);
+  tcase_add_test(tc_basic, peek_head);
+  tcase_add_test(tc_basic, peek_tail);
 
   suite_add_tcase(suite, tc_basic);
   return suite;
