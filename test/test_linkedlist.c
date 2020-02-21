@@ -10,10 +10,8 @@ void setup(void) {
   ll = LinkedList_Allocate();
 }
 
-void doNothing(void *unused) {}
-
 void teardown(void) {
-  LinkedList_Free(ll, doNothing);
+  LinkedList_Free(ll, NULL);
 }
 
 START_TEST(size) {
@@ -138,7 +136,7 @@ START_TEST(append) {
     ck_assert_int_eq(*n, i);
   }
 
-  LinkedList_Free(ll2, doNothing);
+  LinkedList_Free(ll2, NULL);
 }
 END_TEST
 

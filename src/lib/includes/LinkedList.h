@@ -4,19 +4,22 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-// A simple and fast linked list implementation.
+// A simple singly linked list implementation.
 // All operations (except for free) are O(1).
 typedef struct linked_list_t LinkedList;
 
 typedef void *Payload_t;
+
+typedef void (FreeFunction_t (void *payload));
 
 // Allocates a new linked list with no elements and size 0.
 // Returns NULL on failure.
 LinkedList *LinkedList_Allocate();
 
 // Calls free_function on every element in the list.
-// Runtime is O(size)
-void LinkedList_Free(LinkedList *linked_list, void (free_function(void *payload)));
+// If free_function is NULL then it isn't called (and runtime is O(1)).
+// Runtime is O(size).
+void LinkedList_Free(LinkedList *linked_list, FreeFunction_t free_function);
 
 // Returns the number of elements in the linked list.
 size_t LinkedList_Size(LinkedList *linked_list);

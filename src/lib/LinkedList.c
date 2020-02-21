@@ -23,9 +23,11 @@ LinkedList *LinkedList_Allocate() {
   return linked_list;
 }
 
-void LinkedList_Free(LinkedList *linked_list, void (free_function(void *payload))) {
-  while (!LinkedList_IsEmpty(linked_list)) {
-    free_function(LinkedList_PopHead(linked_list));
+void LinkedList_Free(LinkedList *linked_list, FreeFunction_t free_function) {
+  if (free_function != NULL) {
+    while (!LinkedList_IsEmpty(linked_list)) {
+      free_function(LinkedList_PopHead(linked_list));
+    }
   }
 
   free(linked_list);
