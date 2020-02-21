@@ -16,63 +16,60 @@ struct linked_list_t {  // LinkedList
 };
 
 LinkedList *LinkedList_Allocate() {
-  LinkedList *linked_list = (LinkedList*) malloc(sizeof(LinkedList));
-  if (linked_list == NULL)  // check for malloc failure
-    return NULL;
+  LinkedList *list = (LinkedList*) malloc(sizeof(LinkedList));
+  if (list == NULL) return NULL;
 
-  *linked_list = (LinkedList) {.head = NULL, .tail = NULL, .size = 0};
-  return linked_list;
+  *list = (LinkedList) {.head = NULL, .tail = NULL, .size = 0};
+  return list;
 }
 
-void LinkedList_Free(LinkedList *linked_list, FreeFunction_t free_function) {
+void LinkedList_Free(LinkedList *list, FreeFunction_t free_function) {
   if (free_function != NULL) {
-    while (!LinkedList_IsEmpty(linked_list)) {
-      free_function(LinkedList_PopHead(linked_list));
+    while (!LinkedList_IsEmpty(list)) {
+      free_function(LinkedList_PopHead(list));
     }
   }
 
-  free(linked_list);
+  free(list);
 }
 
-size_t LinkedList_Size(LinkedList *linked_list) {
-  return linked_list->size;
+size_t LinkedList_Size(LinkedList *list) {
+  return list->size;
 }
 
-bool LinkedList_IsEmpty(LinkedList *linked_list) {
-  return linked_list->size == 0;
+bool LinkedList_IsEmpty(LinkedList *list) {
+  return list->size == 0;
 }
 
-bool LinkedList_PushHead(LinkedList *linked_list, Payload_t payload) {
+bool LinkedList_PushHead(LinkedList *list, Payload_t payload) {
   Node *node = (Node *) malloc(sizeof(Node));
-  if (node == NULL)  // check for malloc failure
-    return false;
+  if (node == NULL) return false;
 
-  *node = (Node) {.payload = payload, .next = linked_list->head};
+  *node = (Node) {.payload = payload, .next = list->head};
 
-  if (linked_list->size == 0) {
-    linked_list->head = linked_list->tail = node;
+  if (list->size == 0) {
+    list->head = list->tail = node;
   } else {
-    linked_list->head = node;
+    list->head = node;
   }
 
-  linked_list->size++;
+  list->size++;
 
   return true;
 }
 
-Payload_t LinkedList_PopHead(LinkedList *linked_list) {
-  if (LinkedList_IsEmpty(linked_list))
-    return NULL;
+Payload_t LinkedList_PopHead(LinkedList *list) {
+  if (LinkedList_IsEmpty(list)) return NULL;
 
-  Node *old_head = linked_list->head;
+  Node *old_head = list->head;
   
-  if (linked_list->size == 1) {
-    linked_list->head = linked_list->tail = NULL;
+  if (list->size == 1) {
+    list->head = list->tail = NULL;
   } else {
-    linked_list->head = linked_list->head->next;
+    list->head = list->head->next;
   }
 
-  linked_list->size--;
+  list->size--;
 
   Payload_t payload = old_head->payload;
 
@@ -81,46 +78,45 @@ Payload_t LinkedList_PopHead(LinkedList *linked_list) {
   return payload;
 }
 
-Payload_t LinkedList_PeekHead(LinkedList *linked_list) {
-  if (LinkedList_IsEmpty(linked_list))
-    return NULL;
-  return linked_list->head->payload;
+Payload_t LinkedList_PeekHead(LinkedList *list) {
+  if (LinkedList_IsEmpty(list)) return NULL;
+
+  return list->head->payload;
 }
 
-bool LinkedList_PushTail(LinkedList *linked_list, Payload_t payload) {
+bool LinkedList_PushTail(LinkedList *list, Payload_t payload) {
   Node *node = (Node *) malloc(sizeof(Node));
-  if (node == NULL)  // check for malloc failure
-    return false;
+  if (node == NULL) return false;
 
   *node = (Node) {.payload = payload, .next = NULL};
 
-  if (linked_list->size == 0) {
-    linked_list->head = linked_list->tail = node;
+  if (list->size == 0) {
+    list->head = list->tail = node;
   } else {
-    linked_list->tail->next = node;
-    linked_list->tail = node;
+    list->tail->next = node;
+    list->tail = node;
   }
 
-  linked_list->size++;
+  list->size++;
 
   return true;
 }
 
-Payload_t LinkedList_PeekTail(LinkedList *linked_list) {
-  if (LinkedList_IsEmpty(linked_list))
-    return NULL;
-  return linked_list->tail->payload;
+Payload_t LinkedList_PeekTail(LinkedList *list) {
+  if (LinkedList_IsEmpty(list)) return NULL;
+
+  return list->tail->payload;
 }
 
 void LinkedList_Append(LinkedList *dest, LinkedList *src) {
-  if (src->size == 0)
-    return;
+  if (src->size == 0) return;
 
   if (dest->size == 0) {
     dest->head = src->head;
   } else {
     dest->tail->next = src->head;
   }
+
   dest->tail = src->tail;
   dest->size += src->size;
   
@@ -128,11 +124,11 @@ void LinkedList_Append(LinkedList *dest, LinkedList *src) {
   src->size = 0;
 }
 
-bool LinkedList_Find(LinkedList *linked_list, Payload_t target, Payload_t *result, Comparator_t comparator) {
-  Node *curr = linked_list->head;
+bool LinkedList_Find(LinkedList *list, Payload_t target, Payload_t *output, Comparator_t comparator) {
+  Node *curr = list->head;
   while (curr != NULL) {
     if (comparator(curr->payload, target)) {
-      *result = curr->payload;
+      *output = curr->payload;
       return true;
     }
     curr = curr->next;
