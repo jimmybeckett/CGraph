@@ -112,8 +112,8 @@ START_TEST(append) {
   ck_assert(LinkedList_IsEmpty(ll));
   ck_assert(LinkedList_IsEmpty(ll2));
 
-  LinkedList_PushHead(ll, (void*) 2);
-  LinkedList_PushHead(ll, (void*) 1);
+  LinkedList_PushHead(ll, (void *) 2);
+  LinkedList_PushHead(ll, (void *) 1);
   // ll: 1 -> 2
   
   LinkedList_Append(ll, ll2);
@@ -154,6 +154,30 @@ START_TEST(test_free) {
 }
 END_TEST
 
+// n1 and n2 are really int64_t's put into void*'s
+bool equalInt(void *n1, void *n2) {
+  return (int64_t) n1 == (int64_t) n2;
+}
+
+START_TEST(test_find) {
+  int64_t n = 10;
+  int64_t output;
+
+  ck_assert(!LinkedList_Find(ll, (void *) n, (Payload_t *) &output, equalInt));
+
+  for (int64_t i = 0; i < n; i++) {
+    LinkedList_PushHead(ll, (void *) i);
+  }
+
+  for (int64_t i = 0; i < n; i++) {
+    ck_assert(LinkedList_Find(ll, (void *) i, (Payload_t *) &output, equalInt));
+    ck_assert_int_eq(i, output);
+  }
+
+  ck_assert(!LinkedList_Find(ll, (void *) n, (Payload_t *) &output, equalInt));
+}
+END_TEST
+
 Suite *basic_suite(void) {
   Suite *suite = suite_create("LinkedList Basic Suite");
 
@@ -167,6 +191,7 @@ Suite *basic_suite(void) {
   tcase_add_test(tc_basic, peek_head);
   tcase_add_test(tc_basic, peek_tail);
   tcase_add_test(tc_basic, test_free);
+  tcase_add_test(tc_basic, test_find);
 
   suite_add_tcase(suite, tc_basic);
   return suite;

@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <LinkedList.h>
 
 typedef struct node_t {
@@ -125,4 +126,16 @@ void LinkedList_Append(LinkedList *dest, LinkedList *src) {
   
   src->head = src->tail = NULL;
   src->size = 0;
+}
+
+bool LinkedList_Find(LinkedList *linked_list, Payload_t target, Payload_t *result, Comparator_t comparator) {
+  Node *curr = linked_list->head;
+  while (curr != NULL) {
+    if (comparator(curr->payload, target)) {
+      *result = curr->payload;
+      return true;
+    }
+    curr = curr->next;
+  }
+  return false;
 }

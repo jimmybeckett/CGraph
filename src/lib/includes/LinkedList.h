@@ -12,6 +12,8 @@ typedef void *Payload_t;
 
 typedef void (FreeFunction_t (void *payload));
 
+typedef bool (Comparator_t (void *payload, void *target));
+
 // Allocates a new linked list with no elements and size 0.
 // Returns NULL on failure.
 LinkedList *LinkedList_Allocate();
@@ -51,5 +53,10 @@ Payload_t LinkedList_PeekTail(LinkedList *linked_list);
 
 // Appends the contents from src onto the tail of destination, leaving src empty.
 void LinkedList_Append(LinkedList *dest, LinkedList *src);
+
+// Finds and returns through output the Payload_t closest to the head of the list where comparator(payload, target) 
+// is true.
+// Returns true if such a payload was found, and false otherwise.
+bool LinkedList_Find(LinkedList *linked_list, Payload_t target, Payload_t *output, Comparator_t comparator);
 
 #endif  // LINKED_LIST_H_
