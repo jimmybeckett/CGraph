@@ -108,19 +108,19 @@ bool HashTable_Insert(HashTable *table, KeyValue_t keyValue) {
   return true;
 }
 
-bool HashTable_Get(HashTable *table, Key_t key, Value_t *output) {
+bool HashTable_Get(HashTable *table, Key_t key, KeyValue_t *output) {
   LinkedList *bucket = table->buckets[table->hash_function(key) % table->capacity];
 
   KeyValue_t keyValue = { .key = key, .value = NULL };
-  KeyValue_t *result;
-  if (LinkedList_Find(bucket, &keyValue, (void **) &result, (LL_Comparator_t *) table->key_comparator)) {
-    *output = result->value;
+  KeyValue_t *find_result;
+  if (LinkedList_Find(bucket, &keyValue, (void **) &find_result, (LL_Comparator_t *) table->key_comparator)) {
+    *output = *find_result;
     return true;
   }
   return false;
 }
 
-// Value_t HashTable_Remove(HashTable *table, Key_t key);
+// bool HashTable_Remove(HashTable *table, Key_t key, KeyValue_t *output);
 
 /**************************************
  * Static helper functions

@@ -39,28 +39,31 @@ START_TEST(size) {
 }
 END_TEST
 
-START_TEST(insert_get) {
+START_TEST(insert_get) { 
   // HT: []
-  Value_t v;
-  ck_assert(!HashTable_Get(table, (void *) 1, &v));
+  KeyValue_t kv;
+  ck_assert(!HashTable_Get(table, (void *) 1, &kv));
 
   HashTable_Insert(table, (KeyValue_t) { .key = (void *) 1, .value = (void *) 2 });
   // HT: [1 : {1, 2}]
 
-  ck_assert(HashTable_Get(table, (void *) 1, &v));
-  ck_assert_int_eq((int) v, 2);
+  ck_assert(HashTable_Get(table, (void *) 1, &kv));
+  ck_assert_int_eq((int) kv.key, 1);
+  ck_assert_int_eq((int) kv.value, 2);
 
-  ck_assert(!HashTable_Get(table, (void *) 2, &v));
-  ck_assert(!HashTable_Get(table, (void *) 11, &v));  // hash(11) == 11 % 10 == 1
+  ck_assert(!HashTable_Get(table, (void *) 2, &kv));
+  ck_assert(!HashTable_Get(table, (void *) 11, &kv));  // hash(11) == 11 % 10 == 1
 
   HashTable_Insert(table, (KeyValue_t) { .key = (void *) 11, .value = (void *) 3 });
   // HT: [1 : {1, 2}, {11, 3}]
 
-  ck_assert(HashTable_Get(table, (void *) 1, (void **) &v));
-  ck_assert_int_eq((int) v, 2);
+  ck_assert(HashTable_Get(table, (void *) 1, &kv));
+  ck_assert_int_eq((int) kv.key, 1);
+  ck_assert_int_eq((int) kv.value, 2);
 
-  ck_assert(HashTable_Get(table, (void *) 11, (void **) &v));
-  ck_assert_int_eq((int) v, 3);
+  ck_assert(HashTable_Get(table, (void *) 11, &kv));
+  ck_assert_int_eq((int) kv.key, 11);
+  ck_assert_int_eq((int) kv.value, 3);
 }
 END_TEST
 
@@ -70,12 +73,12 @@ START_TEST(resize) {
     HashTable_Insert(table, (KeyValue_t) { .key = (void *) i, .value = (void *) (i + 1) });
   }
 
-  Value_t v;
+  KeyValue_t kv;
   for (int64_t i = 0; i < 10000; i += 7 + i % 13) {
-    ck_assert(HashTable_Get(table, (void *) i, &v));
-    ck_assert_int_eq((int) v, i + 1);
+    ck_assert(HashTable_Get(table, (void *) i, &kv));
+    ck_assert_int_eq((int) kv.value, i + 1);
 
-    ck_assert(!HashTable_Get(table, (void *) (i + 1), &v));
+    ck_assert(!HashTable_Get(table, (void *) (i + 1), &kv));
   }
 }
 END_TEST

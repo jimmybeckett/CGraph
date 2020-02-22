@@ -34,8 +34,8 @@ bool HashTable_IsEmpty(HashTable *table);
 
 bool HashTable_Insert(HashTable *table, KeyValue_t keyValue);
 
-bool HashTable_Get(HashTable *table, Key_t key, Value_t *result);
+bool HashTable_Get(HashTable *table, Key_t key, KeyValue_t *result);
 
-// Value_t HashTable_Remove(HashMap *table, Key_t key);
+// bool HashTable_Remove(HashTable *table, Key_t key, KeyValue_t *result);
 
 #endif  // HASH_TABLE_H_
