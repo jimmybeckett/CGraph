@@ -54,4 +54,29 @@ bool LinkedList_Find(LinkedList *list, Payload_t target, Payload_t *output, LL_C
 // Returns true if such a payload was found, and false otherwise.
 bool LinkedList_RemoveIfPresent(LinkedList *list, Payload_t target, Payload_t *output, LL_Comparator_t *comparator);
 
+/**************************************
+ * Linked list iterator
+**************************************/
+
+// Used for iterating through a linked list from head -> tail.
+typedef struct lliterator_t LLIterator;
+
+// Allocates a new LLIterator.
+// Returns NULL on failure.
+LLIterator *LLIterator_Allocate(LinkedList *list);
+
+// Frees an iterator.
+void LLIterator_Free(LLIterator *iter);
+
+// Returns true if the iterator is valid (not at the end of the list) and false otherwise.
+bool LLIterator_IsValid(LLIterator *iter);
+
+// If the iterator is valid, the current value of the iterator is assigned to output and true is returned.
+// If the iterator isn't valid, false is returned.
+bool LLIterator_Get(LLIterator *iter, Payload_t *output);
+
+// Advances the iterator by 1. 
+// Returns true if the iterator is valid and false otherwise.
+bool LLIterator_Next(LLIterator *iter);
+
 #endif  // LINKED_LIST_H_

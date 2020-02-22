@@ -122,6 +122,43 @@ START_TEST(test_find) {
 }
 END_TEST
 
+START_TEST(remove_if_present) {
+  int64_t n = 10;
+  for (int64_t i = 0; i < n; i++) {
+    LinkedList_PushHead(ll, (void *) i);
+  }
+  // ll: 9 -> 8 -> ... -> 0
+
+  int64_t out;
+  for (int64_t i = 0; i < n; i += 2) {
+    // ck_assert(LinkedList_RemoveIfPresent(ll, (void *) i, (void **) &out, equalInt));
+    LinkedList_RemoveIfPresent(ll, (void *) i, (void **) &out, equalInt);
+    ck_assert_int_eq(i, out);
+  }
+
+  // ll: 9 -> 7 -> ... -> 1
+
+  for (int64_t i = n - 1; i > 0; i -= 2) {
+    ck_assert_int_eq((int) LinkedList_PopHead(ll), i);
+  }
+
+  ck_assert(LinkedList_IsEmpty(ll));
+}
+END_TEST
+
+START_TEST(iterator) {
+  int n = 10000;
+  for (int64_t i = 0; i <= n; i++) {
+    LinkedList_PushHead(ll, (void *) i);
+  }
+
+  LLIterator *iter = LLIterator_Allocate(ll);
+  for (int64_t j, i = n; LLIterator_Get(iter, (void**) &j); LLIterator_Next(iter), i--) {
+    ck_assert_int_eq(j, i);
+  }
+}
+END_TEST
+
 Suite *basic_suite(void) {
   Suite *suite = suite_create("LinkedList Basic Suite");
 
@@ -135,6 +172,8 @@ Suite *basic_suite(void) {
   tcase_add_test(tc_basic, peek_head);
   tcase_add_test(tc_basic, test_free);
   tcase_add_test(tc_basic, test_find);
+  tcase_add_test(tc_basic, remove_if_present);
+  tcase_add_test(tc_basic, iterator);
 
   suite_add_tcase(suite, tc_basic);
   return suite;

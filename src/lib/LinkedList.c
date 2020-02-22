@@ -4,15 +4,28 @@
 #include <stdio.h>
 #include <LinkedList.h>
 
+/**************************************
+ * Structs
+**************************************/
+
 typedef struct node_t {
   Payload_t payload;
   struct node_t *next;
 } Node;
 
-struct linked_list_t {  // LinkedList
+struct linked_list_t {  // LinkedList, declared in LinkedList.h
   Node *head;
   size_t size;
 };
+
+struct lliterator_t {  // LLIterator, declared in LinkedList.h
+  LinkedList *list;
+  Node *curr;
+};
+
+/**************************************
+ * Functions declared in LinkedList.h
+**************************************/
 
 LinkedList *LinkedList_Allocate() {
   LinkedList *list = (LinkedList*) malloc(sizeof(LinkedList));
@@ -85,7 +98,7 @@ bool LinkedList_Find(LinkedList *list, Payload_t target, Payload_t *output, LL_C
 bool LinkedList_RemoveIfPresent(LinkedList *list, Payload_t target, Payload_t *output, LL_Comparator_t *comparator) {
   if (LinkedList_IsEmpty(list)) return false;
 
-  if (comparator(list->head, target)) {
+  if (comparator(list->head->payload, target)) {
     *output = list->head->payload;
     Node *old_head = list->head;
     list->head = list->head->next;
@@ -96,7 +109,7 @@ bool LinkedList_RemoveIfPresent(LinkedList *list, Payload_t target, Payload_t *o
 
   Node *curr = list->head;
   while (curr->next != NULL) {
-    if (comparator(curr->next, target)) {
+    if (comparator(curr->next->payload, target)) {
       *output = curr->next->payload;
       Node *old_next = curr->next;
       curr->next = curr->next->next;
@@ -107,5 +120,40 @@ bool LinkedList_RemoveIfPresent(LinkedList *list, Payload_t target, Payload_t *o
     curr = curr->next;
   }
 
+  return false;
+}
+
+/**************************************
+ * Linked list iterator
+**************************************/
+
+LLIterator *LLIterator_Allocate(LinkedList *list) {
+  LLIterator *iter = (LLIterator *) malloc(sizeof(LLIterator));
+  if (iter == NULL) return NULL;
+  *iter = (LLIterator) { .list = list, .curr = list->head };
+  return iter;
+}
+
+void LLIterator_Free(LLIterator *iter) {
+  free(iter);
+}
+
+bool LLIterator_IsValid(LLIterator *iter) {
+  return iter->curr != NULL;
+}
+
+bool LLIterator_Get(LLIterator *iter, Payload_t *output) {
+  if (LLIterator_IsValid(iter)) {
+    *output = iter->curr->payload;
+    return true;
+  }
+  return false;
+}
+
+bool LLIterator_Next(LLIterator *iter) {
+  if (LLIterator_IsValid(iter)) {
+    iter->curr = iter->curr->next;
+    return true;
+  }
   return false;
 }
