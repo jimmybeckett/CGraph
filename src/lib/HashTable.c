@@ -27,8 +27,8 @@ struct hashtable_t {  // HashTable (declared in HashTable.h)
  * Static helper function prototypes
 **************************************/
 
-// Returns 0 on failure, and the new capacity of the table otherwise
-// static size_t ResizeIfNecessary(HashTable *table);
+// Returns true on success and false on failure
+static bool ResizeIfNecessary(HashTable *table);
 
 /**************************************
  * Functions in HashTable.h
@@ -50,7 +50,7 @@ HashTable *HashTable_Allocate(HT_KeyComparator_t *key_comparator, HT_HashFunctio
     if (table->buckets[i] == NULL) {  // check for LL_Alloc error
       // free already allocated buckets
       for (size_t j = 0; j < i; j++) {
-        LinkedList_Free(table->buckets[j], NULL);  // buckets are empty, so NULL free function is fine
+        LinkedList_Free(table->buckets[j], NULL);  // table->buckets[j] is empty
       }
       free(table->buckets);
       free(table);
@@ -71,6 +71,10 @@ void HashTable_Free(HashTable *table, HT_FreeFunction_t *free_function) {
 
 size_t HashTable_Size(HashTable *table) {
   return table->size;
+}
+
+bool HashTable_IsEmpty(HashTable *table) {
+  return table->size == 0;
 }
 
 bool HashTable_Insert(HashTable *table, KeyValue_t keyValue) {
@@ -95,11 +99,11 @@ bool HashTable_Insert(HashTable *table, KeyValue_t keyValue) {
 
   table->size++;
 
-  /*
-  if (ResizeIfNecessary(table) == 0) {
-    // TODO: remove newly inserted keyvalue from bucket
+  if (!ResizeIfNecessary(table)) {
+    KeyValue_t *unused;
+    LinkedList_RemoveIfPresent(bucket, keyValue_cpy, (void **) &unused, (LL_Comparator_t *) table->key_comparator);
     return false;
-  } */
+  }
 
   return true;
 }
@@ -121,10 +125,9 @@ bool HashTable_Get(HashTable *table, Key_t key, Value_t *output) {
 /**************************************
  * Static helper functions
 **************************************/
-/*
-static size_t ResizeIfNecessary(HashTable *table) {
+static bool ResizeIfNecessary(HashTable *table) {
   if (table->size <= table->capacity * LOAD_FACTOR) {  // check if resize needed
-    return table->capacity;
+    return true;
   }
 
   // double the capacity
@@ -138,34 +141,36 @@ static size_t ResizeIfNecessary(HashTable *table) {
     if (new_buckets[i] == NULL) {  // check for LL_Alloc failure
       // cleanup
       for (size_t j = 0; j < i; j++) {
-        // new_buckets[i] is empty, so the free function (NULL) is never called
-        LinkedList_Free(new_buckets[i], NULL); 
+        LinkedList_Free(new_buckets[i], NULL);  // new_buckets[i] is empty
       }
       free(new_buckets);
-      return 0;
+      return false;
     }
   }
 
+  // transfer from table->buckets to new_buckets
   for (size_t i = 0; i < table->capacity; i++) {
-    LinkedList *bucket = table->buckets[i];
-    // TODO: use an iterator
-    for (size_t j = 0; j < LinkedList_Size(bucket); j++) {
-      KeyValue_t *kv = LinkedList_PopHead(bucket);
-
-      // TODO: this is stupidly inefficient
-      if (PutIntoBucket(new_buckets[kv->key % new_capacity], kv->key, kv->value) == 0) {
-        // TODO: clean up everything
-        return 0;
+    LLIterator *iter = LLIterator_Allocate(table->buckets[i]);
+    for (KeyValue_t *kv; LLIterator_Get(iter, (void **) &kv); LLIterator_Next(iter)) {
+      if (!LinkedList_PushHead(new_buckets[table->hash_function(kv->key) % new_capacity], kv)) {
+        // clean up
+        for (size_t j = 0; j < new_capacity; j++) {
+          LinkedList_Free(new_buckets[j], NULL);  // doesn't free the actual elements
+        }
+        free(new_buckets);
+        return false;
       }
-      free(kv);
     }
-
-    // bucket is empty, so the free function (NULL) is never called
-    LinkedList_Free(bucket, NULL);  
   }
 
+  // free table->buckets
+  for (size_t i = 0; i < table->capacity; i++) {
+    LinkedList_Free(table->buckets[i], NULL);  // doesn't free the actual elements
+  }
   free(table->buckets);
+
   table->buckets = new_buckets;
   table->capacity = new_capacity;
-  return table->capacity;
-} */
+
+  return true;
+}

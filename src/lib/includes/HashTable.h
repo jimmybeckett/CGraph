@@ -30,6 +30,8 @@ void HashTable_Free(HashTable *table, HT_FreeFunction_t *free_function);
 
 size_t HashTable_Size(HashTable *table);
 
+bool HashTable_IsEmpty(HashTable *table);
+
 bool HashTable_Insert(HashTable *table, KeyValue_t keyValue);
 
 bool HashTable_Get(HashTable *table, Key_t key, Value_t *result);

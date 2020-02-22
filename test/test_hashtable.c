@@ -64,6 +64,22 @@ START_TEST(insert_get) {
 }
 END_TEST
 
+START_TEST(resize) {
+  // a nice random-ish sequence
+  for (int64_t i = 0; i < 10000; i += 7 + i % 13) {
+    HashTable_Insert(table, (KeyValue_t) { .key = (void *) i, .value = (void *) (i + 1) });
+  }
+
+  Value_t v;
+  for (int64_t i = 0; i < 10000; i += 7 + i % 13) {
+    ck_assert(HashTable_Get(table, (void *) i, &v));
+    ck_assert_int_eq((int) v, i + 1);
+
+    ck_assert(!HashTable_Get(table, (void *) (i + 1), &v));
+  }
+}
+END_TEST
+
 Suite *basic_suite(void) {
   Suite *suite = suite_create("HashTable Basic Test Suite");
 
@@ -72,6 +88,7 @@ Suite *basic_suite(void) {
 
   tcase_add_test(tc_basic, size);
   tcase_add_test(tc_basic, insert_get);
+  tcase_add_test(tc_basic, resize);
 
   suite_add_tcase(suite, tc_basic);
   return suite;
