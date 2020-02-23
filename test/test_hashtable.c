@@ -70,17 +70,38 @@ START_TEST(insert_get) {
 END_TEST
 
 START_TEST(resize) {  // puts enough elements in the table to force a resize
+  int n = 10000;
   // a nice random-ish sequence
-  for (int64_t i = 0; i < 10000; i += 7 + i % 13) {
+  for (int64_t i = 0; i < n; i += 7 + i % 13) {
     ck_assert(HashTable_Insert(table, (KeyValue_t) { .key = (void *) i, .value = (void *) (i + 1) }));
   }
 
   KeyValue_t kv;
-  for (int64_t i = 0; i < 10000; i += 7 + i % 13) {
+  for (int64_t i = 0; i < n; i += 7 + i % 13) {
     ck_assert(HashTable_Get(table, (void *) i, &kv));
     ck_assert_int_eq((int) kv.value, i + 1);
 
     ck_assert(!HashTable_Get(table, (void *) (i + 1), &kv));
+  }
+}
+END_TEST
+
+
+START_TEST(remove_test) {  // "remove" is already defined
+  int n = 10;
+  // a nice random-ish sequence
+  for (int64_t i = 0; i < n; i++) {
+    ck_assert(HashTable_Insert(table, (KeyValue_t) { .key = (void *) i, .value = (void *) (i + 1) }));
+  }
+
+  KeyValue_t kv;
+  for (int64_t i = 0; i < n; i += 2) {
+    ck_assert(HashTable_Remove(table, (void *) i, &kv));
+    ck_assert_int_eq((int) kv.value, i + 1);
+
+    ck_assert(!HashTable_Get(table, (void *) (i), &kv));  // check i was actually removed
+    ck_assert(HashTable_Get(table, (void *) (i + 1), &kv));
+    ck_assert_int_eq((int) kv.value, i + 2);
   }
 }
 END_TEST
@@ -94,6 +115,7 @@ Suite *basic_suite(void) {
   tcase_add_test(tc_basic, size);
   tcase_add_test(tc_basic, insert_get);
   tcase_add_test(tc_basic, resize);
+  tcase_add_test(tc_basic, remove_test);
 
   suite_add_tcase(suite, tc_basic);
   return suite;

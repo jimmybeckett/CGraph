@@ -20,7 +20,7 @@ typedef struct node {
   struct node *next;
 } Node;
 
-struct hashtable_t {  // HashTable (declared in HashTable.h)
+struct hashtable {  // HashTable (declared in HashTable.h)
   Node **buckets;
   size_t size;
   size_t capacity;
@@ -102,13 +102,13 @@ bool HashTable_Insert(HashTable *table, KeyValue_t kv) {
   return true;
 }
 
-bool HashTable_Get(HashTable *table, Key_t key, KeyValue_t *output) {
+bool HashTable_Get(HashTable *table, Key_t key, KeyValue_t *found_kv) {
   Node **bucket = GetBucket(table, key);
   
   Node *curr = *bucket;
   while (curr != NULL) {
     if (table->key_comparator(curr->kv.key, key)) {
-      *output = curr->kv;
+      *found_kv = curr->kv;
       return true;
     }
     curr = curr->next;
@@ -117,7 +117,32 @@ bool HashTable_Get(HashTable *table, Key_t key, KeyValue_t *output) {
   return false;
 }
 
-bool HashTable_Remove(HashTable *table, Key_t key, KeyValue_t *output) {
+bool HashTable_Remove(HashTable *table, Key_t key, KeyValue_t *removed_kv) {
+  Node **bucket = GetBucket(table, key);
+
+  if (*bucket == NULL) return false;
+
+  if (table->key_comparator((*bucket)->kv.key, key)) {  // check if target key is the first node in the bucket
+    Node *head = *bucket;
+    *bucket = (*bucket)->next;
+    *removed_kv = head->kv;
+    free(head);
+    return true;
+  }
+
+  Node *curr = *bucket;
+  while (curr->next != NULL) {
+    if (table->key_comparator(curr->next->kv.key, key)) {
+      Node *old_next = curr->next;
+      curr->next = curr->next->next;
+      *removed_kv = old_next->kv;
+      free(old_next);
+      return true;
+    }
+    curr = curr->next;
+  }
+
+  return false;
 }
 
 /**************************************
