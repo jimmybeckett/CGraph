@@ -69,7 +69,7 @@ START_TEST(insert_get) {
 }
 END_TEST
 
-START_TEST(resize) {
+START_TEST(resize) {  // puts enough elements in the table to force a resize
   // a nice random-ish sequence
   for (int64_t i = 0; i < 10000; i += 7 + i % 13) {
     ck_assert(HashTable_Insert(table, (KeyValue_t) { .key = (void *) i, .value = (void *) (i + 1) }));
@@ -81,7 +81,7 @@ START_TEST(resize) {
     ck_assert_int_eq((int) kv.value, i + 1);
 
     ck_assert(!HashTable_Get(table, (void *) (i + 1), &kv));
- }
+  }
 }
 END_TEST
 

@@ -8,7 +8,8 @@
 **************************************/
 
 #define INITIAL_CAPACITY (2 << 4)
-#define LOAD_FACTOR .75
+#define CAPACITY_INC_MULTIPLIER 2  // capacity *= CAPACITY_INC_MULTIPLIER when increasing capacity
+#define LOAD_FACTOR .75  // increase capacity when size > capacity * LOAD_FACTOR
 
 /**************************************
  * Struct definitions
@@ -97,6 +98,7 @@ bool HashTable_Insert(HashTable *table, KeyValue_t kv) {
   *bucket = new_node;
 
   table->size++;
+  ResizeIfNecessary(table);
   return true;
 }
 
@@ -122,6 +124,31 @@ bool HashTable_Remove(HashTable *table, Key_t key, KeyValue_t *output) {
  * Static helper functions
 **************************************/
 static bool ResizeIfNecessary(HashTable *table) {
+  if (table->capacity * LOAD_FACTOR > table->size) return true;  // resize not necessary :)
+
+  size_t new_capacity = CAPACITY_INC_MULTIPLIER * table->capacity;
+  Node **new_buckets = (Node**) calloc(new_capacity, sizeof(Node*));
+  if (new_buckets == NULL) return false;
+
+  size_t old_capacity = table->capacity;
+  table->capacity = new_capacity;
+  Node **old_buckets = table->buckets;
+  table->buckets = new_buckets;
+
+  // move all nodes from old_buckets to table->buckets (aka new_buckets)
+  for (size_t i = 0; i < old_capacity; i++) {
+    Node *curr = old_buckets[i];
+    while (curr != NULL) {
+      Node *old_curr = curr;
+      curr = curr->next;
+      Node** new_bucket = GetBucket(table, old_curr->kv.key);
+      old_curr->next = *new_bucket;
+      *new_bucket = old_curr;
+    }
+  }
+
+  free(old_buckets);
+  return true;
 }
 
 static void FreeBucket(Node *bucket, HT_FreeFunction_t *free_function) {
