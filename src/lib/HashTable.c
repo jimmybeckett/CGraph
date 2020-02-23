@@ -83,6 +83,8 @@ bool HashTable_IsEmpty(HashTable *table) {
 }
 
 bool HashTable_Insert(HashTable *table, KeyValue_t kv) {
+  if (!ResizeIfNecessary(table)) return false;
+
   Node **bucket = GetBucket(table, kv.key);
 
   // look through the bucket for key that's "equal" to kv->key
@@ -104,7 +106,7 @@ bool HashTable_Insert(HashTable *table, KeyValue_t kv) {
   *bucket = new_node;
 
   table->size++;
-  ResizeIfNecessary(table);
+
   return true;
 }
 
@@ -136,6 +138,7 @@ bool HashTable_Remove(HashTable *table, Key_t key, KeyValue_t *removed_kv) {
     return true;
   }
 
+  // look through the appropriate bucket for the target key
   Node *curr = *bucket;
   while (curr->next != NULL) {
     if (table->key_comparator(curr->next->kv.key, key)) {
