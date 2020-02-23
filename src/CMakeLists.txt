@@ -1,4 +1,4 @@
 add_subdirectory(lib)
 
 add_executable(main main.c)
-target_link_libraries(main linkedlist)
+target_link_libraries(main hashtable)
