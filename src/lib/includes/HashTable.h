@@ -18,13 +18,13 @@ typedef struct KeyValue_t {
   Value_t value;
 } KeyValue_t;
 
-typedef void (HT_FreeFunction_t(KeyValue_t *keyValue));
+typedef void (HT_FreeFunction_t(KeyValue_t keyValue));
 
 typedef Hash_t (HT_HashFunction_t(Key_t key));
 
-typedef bool (HT_KeyComparator_t(KeyValue_t *kv1, KeyValue_t *kv2));
+typedef bool (HT_KeyComparator_t(Key_t kv1, Key_t kv2));
 
-HashTable *HashTable_Allocate(HT_KeyComparator_t *key_comparator, HT_HashFunction_t *hash_function);
+HashTable *HashTable_Allocate(HT_HashFunction_t *hash_function, HT_KeyComparator_t *key_comparator);
 
 void HashTable_Free(HashTable *table, HT_FreeFunction_t *free_function);
 
