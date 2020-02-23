@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
   HashTable *table = HashTable_Allocate((HT_HashFunction_t *) &hashString, (HT_KeyComparator_t *) &strcmp);
 
   // initialize strings so that allocation time doesn't screw with with timing
-  const size_t num_strings = 10000;
+  const size_t num_strings = 20000;
   char **ref_array = (char**) malloc(num_strings * sizeof(char*));  // used to compare with hashtable
   const size_t string_len = 8;
   char **strings = (char**) malloc(num_strings * sizeof(char*));
