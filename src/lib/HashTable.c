@@ -35,9 +35,6 @@ struct hashtable {  // HashTable (declared in HashTable.h)
 // Returns true on success and false on failure
 static bool ResizeIfNecessary(HashTable *table);
 
-// Frees every node in bucket, and calls free_function on each node's kv
-static void FreeBucket(Node *bucket, HT_FreeFunction_t *free_function);
-
 // Returns a pointer to the bucket corresponding to key
 static Node **GetBucket(HashTable *table, Key_t key);
 
@@ -62,7 +59,16 @@ HashTable *HashTable_Allocate(HT_HashFunction_t *hash_function, HT_KeyComparator
 
 void HashTable_Free(HashTable *table, HT_FreeFunction_t *free_function) {
   for (size_t i = 0; i < table->capacity; i++) {
-    FreeBucket(table->buckets[i], free_function);
+    // free each bucket
+    Node *curr = table->buckets[i];
+    while (curr != NULL) {
+      Node *old_curr = curr;
+      curr = curr->next;
+      if (free_function != NULL) {
+        free_function(old_curr->kv);
+      }
+      free(old_curr);
+    }
   }
   free(table->buckets);
   free(table);
@@ -174,18 +180,6 @@ static bool ResizeIfNecessary(HashTable *table) {
 
   free(old_buckets);
   return true;
-}
-
-static void FreeBucket(Node *bucket, HT_FreeFunction_t *free_function) {
-  Node *curr = bucket;
-  while (curr != NULL) {
-    Node *old_curr = curr;
-    curr = curr->next;
-    if (free_function != NULL) {
-      free_function(old_curr->kv);
-    }
-    free(old_curr);
-  }
 }
 
 static Node **GetBucket(HashTable *table, Key_t key) {
